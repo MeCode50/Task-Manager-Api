@@ -8,14 +8,20 @@ const showTasks = async () => {
   loadingDOM.style.visibility = 'visible'
   try {
     const {
-      data: { tasks },
+      data: { task },
     } = await axios.get('/api/v1/tasks')
-    if (tasks.length < 1) {
+    console.log('Server Response:', task);  // Log the server response
+
+    if (!task || !Array.isArray(task)) {
+      throw new Error('Invalid tasks data received from the server');
+    }
+    
+    if (task.length < 1) {
       tasksDOM.innerHTML = '<h5 class="empty-list">No tasks in your list</h5>'
       loadingDOM.style.visibility = 'hidden'
       return
     }
-    const allTasks = tasks
+    const allTasks = task
       .map((task) => {
         const { completed, _id: taskID, name } = task
         return `<div class="single-task ${completed && 'task-completed'}">
@@ -38,6 +44,7 @@ const showTasks = async () => {
       .join('')
     tasksDOM.innerHTML = allTasks
   } catch (error) {
+    console.error(error);
     tasksDOM.innerHTML =
       '<h5 class="empty-list">There was an error, please try later....</h5>'
   }
@@ -77,6 +84,7 @@ formDOM.addEventListener('submit', async (e) => {
     formAlertDOM.textContent = `success, task added`
     formAlertDOM.classList.add('text-success')
   } catch (error) {
+    console.log(error)
     formAlertDOM.style.display = 'block'
     formAlertDOM.innerHTML = `error, please try again`
   }
@@ -85,3 +93,4 @@ formDOM.addEventListener('submit', async (e) => {
     formAlertDOM.classList.remove('text-success')
   }, 3000)
 })
+
